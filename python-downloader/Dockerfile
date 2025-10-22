@@ -2,8 +2,14 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir kagglehub
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-COPY download.py .
+COPY config/ ./config/
+COPY infrastructure/ ./infrastructure/
+COPY domain/ ./domain/
+COPY main.py .
 
-CMD ["python", "download.py"]
+ENV PYTHONPATH=/app
+
+CMD ["python", "main.py"]
