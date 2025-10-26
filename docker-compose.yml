@@ -47,6 +47,22 @@ services:
         condition: service_healthy
     networks:
       - job_network
+  
+  ml-service:
+    build: ./ml-service
+    container_name: job_ml_service
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - NUM_CLUSTERS=${NUM_CLUSTERS}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - job_network
 
 volumes:
   postgres_data:
