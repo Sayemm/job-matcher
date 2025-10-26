@@ -1,4 +1,23 @@
 services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: job_postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - job_network
+
   downloader:
     build: ./python-downloader
     container_name: job_downloader
@@ -7,7 +26,32 @@ services:
       - KAGGLE_KEY=${KAGGLE_KEY}
     volumes:
       - csv_data:/data
+    networks:
+      - job_network
+
+  loader:
+    build: ./go-loader
+    container_name: job_loader
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_ENABLE_SSL_MODE=${DB_ENABLE_SSL_MODE}
+      - CSV_PATH=${CSV_PATH}
+    volumes:
+      - csv_data:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - job_network
 
 volumes:
   postgres_data:
   csv_data:
+
+networks:
+  job_network:
+    driver: bridge
