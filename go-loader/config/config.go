@@ -26,12 +26,7 @@ type Config struct {
 var configurations *Config
 
 func loadConfig() {
-	err := godotenv.Load("../.env")
-	if err != nil {
-		fmt.Println(err)
-		fmt.Println("Failed to load the Env Variables")
-		os.Exit(1)
-	}
+	_ = godotenv.Load("../.env")
 
 	dbHost := os.Getenv("DB_HOST")
 	if dbHost == "" {

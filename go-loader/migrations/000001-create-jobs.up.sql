@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS jobs (
     description text,
     location VARCHAR(500),
     remote_allowed BOOLEAN DEFAULT FALSE,
-    experiment_level VARCHAR(100),
+    experience_level VARCHAR(100),
     min_salary NUMERIC(12, 2),
     max_salary NUMERIC(12, 2),
     cluster_id INTEGER,
