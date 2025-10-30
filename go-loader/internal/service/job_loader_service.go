@@ -13,7 +13,7 @@ type JobLoaderService struct {
 	batchSize int
 }
 
-func NewJobLoaderService(repo JobRepository, csvReader CSVReader, batchSize int) *JobLoaderService {
+func NewJobLoaderService(repo JobRepository, csvReader CSVReader, batchSize int) Service {
 	return &JobLoaderService{
 		repo:      repo,
 		csvReader: csvReader,

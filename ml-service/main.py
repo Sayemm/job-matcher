@@ -16,3 +16,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# docker-compose build   
+# docker-compose up postgres -d
+# docker-compose exec postgres psql -U postgres -d jobmatcher -c "SELECT COUNT(*) FROM jobs WHERE cluster_id IS NOT NULL;"

@@ -12,3 +12,7 @@ type JobRepository interface {
 type CSVReader interface {
 	ReadInBatches(batchSize int, callback func([]*domain.Job) error) error
 }
+
+type Service interface {
+	LoadJobs() error
+}
