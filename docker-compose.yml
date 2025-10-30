@@ -64,6 +64,24 @@ services:
     networks:
       - job_network
 
+  api:
+    build: ./go-api
+    container_name: job_api
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - SERVER_PORT=8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - job_network
+
 volumes:
   postgres_data:
   csv_data:
