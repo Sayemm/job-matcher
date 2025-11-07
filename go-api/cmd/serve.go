@@ -5,10 +5,12 @@ import (
 	"os"
 
 	"github.com/Sayemm/job-matcher/go-api/config"
-	"github.com/Sayemm/job-matcher/go-api/internal/application/service/jobService"
+	"github.com/Sayemm/job-matcher/go-api/internal/application/service/jobservice"
+	resumeservice "github.com/Sayemm/job-matcher/go-api/internal/application/service/resumeService"
 	"github.com/Sayemm/job-matcher/go-api/internal/infrastructure/database"
 	"github.com/Sayemm/job-matcher/go-api/internal/infrastructure/http"
 	"github.com/Sayemm/job-matcher/go-api/internal/infrastructure/http/handlers/jobHandler"
+	resumehandler "github.com/Sayemm/job-matcher/go-api/internal/infrastructure/http/handlers/resumeHandler"
 )
 
 func Serve() {
@@ -29,13 +31,15 @@ func Serve() {
 	jobRepo := database.NewJobRepo(dbCon)
 
 	// SERVICE
-	jobService := jobService.NewJobService(jobRepo)
+	jobService := jobservice.NewJobService(jobRepo)
+	resumeService := resumeservice.NewResumeService(jobRepo, cnf.MLServiceURL)
 
 	// HANDLER
 	jobHandler := jobHandler.NewJobHandler(jobService)
+	resumehandler := resumehandler.NewResumeHandler(resumeService)
 
 	// START SERVER
-	server := http.NewServer(jobHandler, cnf.ServerPort)
+	server := http.NewServer(jobHandler, resumehandler, cnf.ServerPort)
 
 	// Start server
 	fmt.Printf("Server starting on http://localhost%s\n", cnf.ServerPort)
