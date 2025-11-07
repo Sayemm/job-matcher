@@ -1,4 +1,4 @@
-package jobService
+package jobservice
 
 import (
 	"github.com/Sayemm/job-matcher/go-api/internal/domain/entity"
