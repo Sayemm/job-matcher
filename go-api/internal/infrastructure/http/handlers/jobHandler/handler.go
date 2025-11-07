@@ -1,4 +1,4 @@
-package handlers
+package jobHandler
 
 type Handler struct {
 	service Service

@@ -3,15 +3,15 @@ package http
 import (
 	"net/http"
 
-	"github.com/Sayemm/job-matcher/go-api/internal/infrastructure/http/handlers"
+	"github.com/Sayemm/job-matcher/go-api/internal/infrastructure/http/handlers/jobHandler"
 )
 
 type Server struct {
-	jobHandler *handlers.Handler
+	jobHandler *jobHandler.Handler
 	port       string
 }
 
-func NewServer(jobHandler *handlers.Handler, port string) *Server {
+func NewServer(jobHandler *jobHandler.Handler, port string) *Server {
 	return &Server{
 		jobHandler: jobHandler,
 		port:       port,

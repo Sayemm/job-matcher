@@ -1,12 +1,12 @@
-package service
+package jobService
 
 import (
 	"github.com/Sayemm/job-matcher/go-api/internal/domain/entity"
-	"github.com/Sayemm/job-matcher/go-api/internal/infrastructure/http/handlers"
+	"github.com/Sayemm/job-matcher/go-api/internal/infrastructure/http/handlers/jobHandler"
 )
 
 type Service interface {
-	handlers.Service
+	jobHandler.Service
 }
 
 type JobRepository interface {

@@ -1,13 +1,13 @@
 package database
 
 import (
-	"github.com/Sayemm/job-matcher/go-api/internal/application/service"
+	"github.com/Sayemm/job-matcher/go-api/internal/application/service/jobService"
 	"github.com/Sayemm/job-matcher/go-api/internal/domain/entity"
 	"github.com/jmoiron/sqlx"
 )
 
 type JobRepository interface {
-	service.JobRepository
+	jobService.JobRepository
 }
 
 type jobRepo struct {

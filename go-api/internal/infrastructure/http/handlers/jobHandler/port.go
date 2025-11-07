@@ -1,4 +1,4 @@
-package handlers
+package jobHandler
 
 import (
 	"github.com/Sayemm/job-matcher/go-api/internal/application/dto"

@@ -5,10 +5,10 @@ import (
 	"os"
 
 	"github.com/Sayemm/job-matcher/go-api/config"
-	"github.com/Sayemm/job-matcher/go-api/internal/application/service"
+	"github.com/Sayemm/job-matcher/go-api/internal/application/service/jobService"
 	"github.com/Sayemm/job-matcher/go-api/internal/infrastructure/database"
 	"github.com/Sayemm/job-matcher/go-api/internal/infrastructure/http"
-	"github.com/Sayemm/job-matcher/go-api/internal/infrastructure/http/handlers"
+	"github.com/Sayemm/job-matcher/go-api/internal/infrastructure/http/handlers/jobHandler"
 )
 
 func Serve() {
@@ -29,10 +29,10 @@ func Serve() {
 	jobRepo := database.NewJobRepo(dbCon)
 
 	// SERVICE
-	jobService := service.NewJobService(jobRepo)
+	jobService := jobService.NewJobService(jobRepo)
 
 	// HANDLER
-	jobHandler := handlers.NewJobHandler(jobService)
+	jobHandler := jobHandler.NewJobHandler(jobService)
 
 	// START SERVER
 	server := http.NewServer(jobHandler, cnf.ServerPort)
