@@ -1,4 +1,4 @@
-package resumeservice
+package resumeService
 
 import (
 	"bytes"

@@ -1,4 +1,4 @@
-package resumehandler
+package resumeHandler
 
 import (
 	"net/http"

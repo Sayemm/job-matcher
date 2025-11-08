@@ -1,4 +1,4 @@
-package resumehandler
+package resumeHandler
 
 type Handler struct {
 	service Service

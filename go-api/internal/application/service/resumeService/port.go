@@ -1,4 +1,4 @@
-package resumeservice
+package resumeService
 
 import (
 	"github.com/Sayemm/job-matcher/go-api/internal/domain/entity"

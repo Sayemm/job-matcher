@@ -1,4 +1,4 @@
-package resumehandler
+package resumeHandler
 
 import (
 	"mime/multipart"
