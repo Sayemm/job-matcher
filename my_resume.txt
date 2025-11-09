@@ -1,9 +1,0 @@
-Senior Software Engineer
-
-Experience:
-- 5 years Python development
-- Built REST APIs with Django
-- Frontend development with React
-- AWS deployment and Docker
-
-Skills: Python, Django, React, PostgreSQL, Docker, AWS
