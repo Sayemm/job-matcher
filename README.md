@@ -93,6 +93,20 @@ Open browser: http://localhost:3000
 docker-compose down
 ```
 
+## Workflow
+
+### One-Time Setup (Data & Training)
+1. **Downloader** → Downloads job dataset from Kaggle (123K jobs)
+2. **Loader** → Parses CSV and loads jobs into PostgreSQL database
+3. **ML Service** → Reads jobs, trains K-means model, assigns cluster IDs to all jobs, saves models to disk
+
+### Runtime (Matching)
+4. **Frontend** → User uploads resume through React UI
+5. **Go API** → Receives resume, extracts text (PDF or TXT)
+6. **ML Matcher** → Vectorizes resume text, compares to cluster centers, returns best matching cluster ID
+7. **Go API** → Queries database for jobs in that cluster, returns paginated results
+8. **Frontend** → Displays matching jobs with scores
+
 ## Tech Stack
 
 - **Frontend**: React + Tailwind CSS
