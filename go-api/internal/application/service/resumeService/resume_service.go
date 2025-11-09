@@ -7,6 +7,7 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"strings"
 
 	"github.com/Sayemm/job-matcher/go-api/internal/application/dto"
 )
@@ -23,6 +24,7 @@ func NewResumeService(jobRepository JobRepository, mlServiceURL string) Service 
 	}
 }
 
+// ExtractTextFromFile extracts text from uploaded file
 func (s *service) ExtractTextFromFile(file multipart.File, filename string) (string, error) {
 	// Read file content
 	content, err := io.ReadAll(file)
@@ -30,14 +32,49 @@ func (s *service) ExtractTextFromFile(file multipart.File, filename string) (str
 		return "", fmt.Errorf("failed to read file: %w", err)
 	}
 
-	// For now, assume it's a text file
-	// Later we will add PDF parsing
-	text := string(content)
+	// Check file type by extension
+	filename = strings.ToLower(filename)
 
-	return text, nil
+	if strings.HasSuffix(filename, ".pdf") {
+		// Send PDF to Python for parsing
+		return s.extractTextFromPDF(content)
+	} else if strings.HasSuffix(filename, ".txt") {
+		// Plain text file
+		return string(content), nil
+	} else {
+		return "", fmt.Errorf("unsupported file type: %s (only .pdf and .txt supported)", filename)
+	}
 }
+
+// extractTextFromPDF sends PDF to Python service for text extraction
+func (s *service) extractTextFromPDF(pdfContent []byte) (string, error) {
+	// Create request to ml-matcher's PDF parsing endpoint
+	url := s.mlServiceURL + "/parse-pdf"
+
+	resp, err := http.Post(url, "application/pdf", bytes.NewBuffer(pdfContent))
+	if err != nil {
+		return "", fmt.Errorf("failed to call PDF parser: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return "", fmt.Errorf("PDF parsing failed with status %d", resp.StatusCode)
+	}
+
+	// Parse response
+	var result struct {
+		Text string `json:"text"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return "", fmt.Errorf("failed to parse PDF response: %w", err)
+	}
+
+	return result.Text, nil
+}
+
+// FindMatchingCluster sends resume to ML service
 func (s *service) FindMatchingCluster(resumeText string) (*dto.ResumeMatchResponse, error) {
-	// Prepare request
 	request := dto.ResumeMatchRequest{
 		ResumeText: resumeText,
 	}
@@ -47,7 +84,6 @@ func (s *service) FindMatchingCluster(resumeText string) (*dto.ResumeMatchRespon
 		return nil, fmt.Errorf("failed to marshal request: %w", err)
 	}
 
-	// Call ML service
 	url := s.mlServiceURL + "/match"
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
@@ -55,7 +91,6 @@ func (s *service) FindMatchingCluster(resumeText string) (*dto.ResumeMatchRespon
 	}
 	defer resp.Body.Close()
 
-	// Parse response
 	var matchResponse dto.ResumeMatchResponse
 	if err := json.NewDecoder(resp.Body).Decode(&matchResponse); err != nil {
 		return nil, fmt.Errorf("failed to parse ML response: %w", err)
@@ -63,8 +98,9 @@ func (s *service) FindMatchingCluster(resumeText string) (*dto.ResumeMatchRespon
 
 	return &matchResponse, nil
 }
+
+// GetRecommendedJobs gets jobs from matched cluster
 func (s *service) GetRecommendedJobs(clusterID int, page, pageSize int) (*dto.JobRecommendationResponse, error) {
-	// Validate
 	if page < 1 {
 		page = 1
 	}
@@ -74,19 +110,16 @@ func (s *service) GetRecommendedJobs(clusterID int, page, pageSize int) (*dto.Jo
 
 	offset := (page - 1) * pageSize
 
-	// Get jobs from cluster
 	jobs, err := s.jobRepository.GetJobsByCluster(clusterID, pageSize, offset)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get jobs: %w", err)
 	}
 
-	// Get total count
 	totalCount, err := s.jobRepository.CountByCluster(clusterID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to count jobs: %w", err)
 	}
 
-	// Build response
 	response := &dto.JobRecommendationResponse{
 		Message:        fmt.Sprintf("Found %d matching jobs in your cluster", totalCount),
 		ClusterID:      clusterID,

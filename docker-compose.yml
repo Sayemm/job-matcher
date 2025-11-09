@@ -58,9 +58,28 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - NUM_CLUSTERS=${NUM_CLUSTERS}
+    volumes:
+      - csv_data:/data
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - job_network
+
+  ml-matcher:
+    build: ./ml-matcher
+    container_name: job_ml_matcher
+    environment:
+      - HOST=0.0.0.0
+      - PORT=5000
+      - MODEL_DIR=/data/model
+      - NUM_CLUSTERS=${NUM_CLUSTERS}
+    volumes:
+      - csv_data:/data 
+    ports:
+      - "5000:5000"
+    depends_on:
+      - ml-service
     networks:
       - job_network
 
@@ -80,6 +99,16 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - job_network
+
+  frontend:
+    build: ./frontend
+    container_name: job_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
     networks:
       - job_network
 
